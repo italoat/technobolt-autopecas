@@ -68,11 +68,11 @@ def registrar_evento(funcao):
 
 # --- 4. MOTOR DE INTELIGÊNCIA COM FAILOVER PENTACAMADA ---
 MODEL_FAILOVER_LIST = [
-    "models/gemini-1.5-pro", 
-    "models/gemini-1.5-flash", 
-    "models/gemini-1.5-flash-8b", 
-    "models/gemini-2.0-flash-exp", 
-    "models/gemini-pro"
+    "models/gemini-3-flash-preview", 
+    "models/gemini-2.5-flash", 
+    "models/gemini-2.0-flash", 
+    "models/gemini-2.0-flash-lite", 
+    "models/gemini-flash-latest"
 ]
 
 def call_technobolt_ai(prompt, attachments=None, system_context="default"):
