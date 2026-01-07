@@ -297,7 +297,7 @@ elif "📧 Gerador de Email Automático" in escolha:
 elif "💬 Vendas" in escolha:
     st.markdown('<div class="main-card"><h2>💬 Vendas & WhatsApp</h2><p>Scripts rápidos para orçamentos e fechamentos.</p></div>', unsafe_allow_html=True)
     detalhes = st.text_area("O que deseja comunicar ao cliente?")
-    if st.button("GERAR SCRIPT PROFISSIONAL"):
+    if st.button("GERAR MENSAGEM"):
         registrar_evento("Script Vendas")
         res, _ = call_technobolt_ai(detalhes, system_context="vendas")
         st.session_state.titulo_resultado, st.session_state.resultado_ia, st.session_state.mostrar_resultado = "Script de Abordagem", res, True
