@@ -138,8 +138,8 @@ if not st.session_state.logged_in:
     _, col_login, _ = st.columns([1, 1.4, 1])
     with col_login:
         st.markdown('<div class="main-card">', unsafe_allow_html=True)
-        st.markdown("<h1 class='hero-title'>REAL ACESSÓRIOS</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align:center; color:#64748b; margin-bottom:40px;'>SISTEMA DE GESTÃO COGNITIVA</p>", unsafe_allow_html=True)
+        st.markdown("<h1 class='hero-title'>TECHNOBOLT</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center; color:#64748b; margin-bottom:40px;'>REAL ACESSÓRIOS - SISTEMA DE GESTÃO COGNITIVA</p>", unsafe_allow_html=True)
         
         user_id = st.text_input("Operador", placeholder="Usuário")
         user_key = st.text_input("Chave", type="password", placeholder="Senha")
