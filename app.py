@@ -183,7 +183,7 @@ menu = [
     "🏠 Centro de Comando",
     "🧾 Revisor de Notas Fiscais", # NOVO
     "📦 Auditor de Estoque",
-    "📧 Email p/ Fornecedores",
+    "📧 Gerador de Email Automático",
     "💰 Inteligência de Compras",
     "🛠️ Consultoria Técnica",
     "💬 Vendas & WhatsApp",
@@ -273,7 +273,7 @@ elif "🛠️ Consultoria Técnica" in escolha:
             st.rerun()
 
 elif "📧 Gerador de Email Automático" in escolha:
-    st.markdown('<div class="main-card"><h2>📧 Gerador de Email p/ Fornecedores</h2><p>Crie pedidos ou cotações anexando sua tabela de itens.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-card"><h2>📧 Gerador de Email Automático</h2><p>Crie pedidos ou cotações anexando sua tabela de itens.</p></div>', unsafe_allow_html=True)
     assunto_email = st.text_input("Objetivo do Email (ex: Pedido de Reposição, Cotação de Filtros):")
     tabela_excel = st.file_uploader("Anexar Tabela de Itens (XLSX, CSV):", type=['xlsx', 'csv'])
     instrucoes_extras = st.text_area("Instruções adicionais (ex: Pedir prazo de 28 dias, entrega urgente):")
