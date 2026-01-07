@@ -66,6 +66,10 @@ def registrar_evento(funcao):
     if 'uso_sessao' not in st.session_state: st.session_state.uso_sessao = {}
     st.session_state.uso_sessao[funcao] = st.session_state.uso_sessao.get(funcao, 0) + 1
 
+def extrair_texto_docx(arquivo):
+    doc = docx.Document(arquivo)
+    return "\n".join([p.text for p in doc.paragraphs])
+
 # --- 4. MOTOR DE INTELIGÊNCIA COM FAILOVER PENTACAMADA ---
 MODEL_FAILOVER_LIST = [
     "models/gemini-3-flash-preview", 
@@ -85,6 +89,7 @@ def call_technobolt_ai(prompt, attachments=None, system_context="default"):
     contexts = {
         "estoque": "Aja como Gestor de Inventário Automotivo Sênior. Foque em Curva ABC, Giro de Estoque e identificação de peças obsoletas.",
         "compras": "Aja como Comprador Estratégico de Autopeças. Analise orçamentos de distribuidores, foque em margem bruta e condições de frete.",
+        "fiscal": "Aja como Revisor Fiscal e de Recebimento de Mercadorias de Autopeças. Analise a Nota Fiscal buscando erros de NCM, divergência de valores unitários, impostos e quantidades.",
         "tecnico": "Aja como Consultor Técnico Especialista em Catálogos Automotivos (TecDoc/Original). Resolva compatibilidades e aplicações de peças.",
         "vendas": "Aja como Especialista em Vendas de Balcão e Atendimento WhatsApp para oficinas. Crie abordagens rápidas, técnicas e persuasivas.",
         "default": "Você é o Motor TechnoBolt focado na Real Acessórios. Respostas técnicas e estruturadas."
@@ -104,10 +109,6 @@ def call_technobolt_ai(prompt, attachments=None, system_context="default"):
 
 # --- Busca de Imagem ---
 def buscar_imagem_peca(query):
-    """
-    Simula a busca de imagem para exibição no balcão.
-    Em um ambiente real, você pode usar a API do Google Custom Search ou Bing.
-    """
     search_url = f"https://www.google.com/search?q={query.replace(' ', '+')}&tbm=isch"
     return search_url
     
@@ -179,6 +180,7 @@ with h2:
 
 menu = [
     "🏠 Centro de Comando",
+    "🧾 Revisor de Notas Fiscais", # NOVO
     "📦 Auditor de Estoque",
     "💰 Inteligência de Compras",
     "🛠️ Consultoria Técnica",
@@ -190,7 +192,7 @@ st.markdown("<hr style='margin: 10px 0 35px 0; border: 0.5px solid #e2e8f0;'>", 
 
 # --- 8. MÓDULOS OPERACIONAIS ---
 
-# --- DASHBOARD CENTRAL (RESTAURADO) ---
+# --- DASHBOARD CENTRAL ---
 if "🏠 Centro" in escolha:
     st.markdown('<div class="main-card"><h1>Command Center</h1><p>MONITORIA DE SOBERANIA DIGITAL & INTELIGÊNCIA AUTOMOTIVA</p></div>', unsafe_allow_html=True)
     
@@ -206,13 +208,35 @@ if "🏠 Centro" in escolha:
     c2.metric("Sessão", st.session_state.user_atual.split('.')[0].upper(), "Protegida")
     c3.metric("DNA Ativo", "Real Acessórios", "Autopeças")
 
+# --- NOVO MÓDULO: REVISOR DE NOTAS FISCAIS ---
+elif "🧾 Revisor de Notas" in escolha:
+    st.markdown('<div class="main-card"><h2>🧾 Revisor Fiscal de Notas</h2><p>Valide NCM, preços e divergências de impostos ou quantidades.</p></div>', unsafe_allow_html=True)
+    nf_file = st.file_uploader("Upload da Nota (PDF, XLSX, DOCX, TXT):", type=['pdf', 'xlsx', 'docx', 'txt'])
+    if nf_file and st.button("AUDITAR NOTA FISCAL"):
+        registrar_evento("Revisor Fiscal")
+        with st.spinner("Analisando integridade fiscal e comercial..."):
+            if nf_file.type == "application/pdf":
+                dados_ia = [{"mime_type": "application/pdf", "data": nf_file.read()}]
+            elif nf_file.name.endswith('docx'):
+                dados_ia = [extrair_texto_docx(nf_file)]
+            else:
+                dados_ia = [nf_file.read().decode(errors='ignore')]
+            
+            res, mod = call_technobolt_ai("Audite esta nota buscando divergências de mercado, NCM ou valores.", dados_ia, system_context="fiscal")
+            st.session_state.titulo_resultado, st.session_state.resultado_ia, st.session_state.mostrar_resultado = f"Auditoria Fiscal ({mod})", res, True
+            st.rerun()
+
 elif "📦 Auditor" in escolha:
     st.markdown('<div class="main-card"><h2>📦 Auditor de Estoque</h2><p>Identificação de peças paradas e prioridades de giro.</p></div>', unsafe_allow_html=True)
     up = st.file_uploader("Upload de Inventário (PDF/DOCX/TXT)", type=['pdf', 'docx', 'txt'])
     if up and st.button("ANALISAR ESTOQUE"):
         registrar_evento("Auditoria Estoque")
         with st.spinner("IA Analisando giro de peças..."):
-            res, mod = call_technobolt_ai("Analise este estoque para a Real Acessórios.", system_context="estoque")
+            if up.type == "application/pdf":
+                dados = [{"mime_type": "application/pdf", "data": up.read()}]
+            else:
+                dados = [up.read().decode(errors='ignore')]
+            res, mod = call_technobolt_ai("Analise este estoque para a Real Acessórios.", dados, system_context="estoque")
             st.session_state.titulo_resultado, st.session_state.resultado_ia, st.session_state.mostrar_resultado = "Diagnóstico de Inventário", res, True
             st.rerun()
 
@@ -235,13 +259,11 @@ elif "🛠️ Consultoria Técnica" in escolha:
         with st.spinner("Buscando especificações e referências visuais..."):
             res, mod = call_technobolt_ai(duvida, system_context="tecnico")
             
-            # Lógica de Gatilho de Imagem
+            # Lógica de Gatilho de Imagem (Inclusão solicitada)
             link_imagem = buscar_imagem_peca(duvida)
             
             # Estruturando o resultado com suporte visual
             st.session_state.titulo_resultado = f"Ficha Técnica IA - {duvida.upper()}"
-            
-            # Adicionando o componente visual ao texto da IA
             corpo_resposta = f"{res}\n\n---\n📸 **REFERÊNCIA VISUAL SUGERIDA:**\n[Clique aqui para ver imagens da peça/item]({link_imagem})"
             
             st.session_state.resultado_ia = corpo_resposta
