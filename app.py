@@ -102,6 +102,15 @@ def call_technobolt_ai(prompt, attachments=None, system_context="default"):
             continue
     return "⚠️ Motores de IA Offline. Contate o suporte.", "OFFLINE"
 
+# --- Busca de Imagem ---
+def buscar_imagem_peca(query):
+    """
+    Simula a busca de imagem para exibição no balcão.
+    Em um ambiente real, você pode usar a API do Google Custom Search ou Bing.
+    """
+    search_url = f"https://www.google.com/search?q={query.replace(' ', '+')}&tbm=isch"
+    return search_url
+    
 # --- 5. DESIGN SYSTEM (ESTÉTICA ELITE HUB) ---
 st.markdown("""
 <style>
@@ -218,13 +227,26 @@ elif "💰 Inteligência de Compras" in escolha:
             st.rerun()
 
 elif "🛠️ Consultoria Técnica" in escolha:
-    st.markdown('<div class="main-card"><h2>🛠️ Consultoria Técnica</h2><p>Dúvidas de aplicação, conversão e compatibilidade.</p></div>', unsafe_allow_html=True)
-    duvida = st.text_input("Peça ou veículo alvo:")
+    st.markdown('<div class="main-card"><h2>🛠️ Consultoria Técnica</h2><p>Dúvidas de aplicação, conversão e suporte visual.</p></div>', unsafe_allow_html=True)
+    duvida = st.text_input("Peça ou veículo alvo (Ex: Óleo do Civic 2008):")
+    
     if st.button("CONSULTAR TÉCNICO IA"):
         registrar_evento("Consulta Técnica")
-        res, _ = call_technobolt_ai(duvida, system_context="tecnico")
-        st.session_state.titulo_resultado, st.session_state.resultado_ia, st.session_state.mostrar_resultado = "Ficha Técnica IA", res, True
-        st.rerun()
+        with st.spinner("Buscando especificações e referências visuais..."):
+            res, mod = call_technobolt_ai(duvida, system_context="tecnico")
+            
+            # Lógica de Gatilho de Imagem
+            link_imagem = buscar_imagem_peca(duvida)
+            
+            # Estruturando o resultado com suporte visual
+            st.session_state.titulo_resultado = f"Ficha Técnica IA - {duvida.upper()}"
+            
+            # Adicionando o componente visual ao texto da IA
+            corpo_resposta = f"{res}\n\n---\n📸 **REFERÊNCIA VISUAL SUGERIDA:**\n[Clique aqui para ver imagens da peça/item]({link_imagem})"
+            
+            st.session_state.resultado_ia = corpo_resposta
+            st.session_state.mostrar_resultado = True
+            st.rerun()
 
 elif "💬 Vendas" in escolha:
     st.markdown('<div class="main-card"><h2>💬 Vendas & WhatsApp</h2><p>Scripts rápidos para orçamentos e fechamentos.</p></div>', unsafe_allow_html=True)
