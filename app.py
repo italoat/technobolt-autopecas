@@ -3,6 +3,7 @@ import google.generativeai as genai
 import os
 import time
 import docx
+import pandas as pd
 from io import BytesIO
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -182,6 +183,7 @@ menu = [
     "🏠 Centro de Comando",
     "🧾 Revisor de Notas Fiscais", # NOVO
     "📦 Auditor de Estoque",
+    "📧 Email p/ Fornecedores",
     "💰 Inteligência de Compras",
     "🛠️ Consultoria Técnica",
     "💬 Vendas & WhatsApp",
@@ -268,6 +270,28 @@ elif "🛠️ Consultoria Técnica" in escolha:
             
             st.session_state.resultado_ia = corpo_resposta
             st.session_state.mostrar_resultado = True
+            st.rerun()
+
+elif "📧 Gerador de Email Automático" in escolha:
+    st.markdown('<div class="main-card"><h2>📧 Gerador de Email p/ Fornecedores</h2><p>Crie pedidos ou cotações anexando sua tabela de itens.</p></div>', unsafe_allow_html=True)
+    assunto_email = st.text_input("Objetivo do Email (ex: Pedido de Reposição, Cotação de Filtros):")
+    tabela_excel = st.file_uploader("Anexar Tabela de Itens (XLSX, CSV):", type=['xlsx', 'csv'])
+    instrucoes_extras = st.text_area("Instruções adicionais (ex: Pedir prazo de 28 dias, entrega urgente):")
+    
+    if st.button("GERAR EMAIL"):
+        registrar_evento("Email Fornecedor")
+        with st.spinner("Processando tabela e redigindo email..."):
+            conteudo_tabela = ""
+            if tabela_excel:
+                try:
+                    df = pd.read_excel(tabela_excel) if tabela_excel.name.endswith('xlsx') else pd.read_csv(tabela_excel)
+                    conteudo_tabela = f"\nTABELA DE ITENS:\n{df.to_string(index=False)}"
+                except Exception as e:
+                    st.error(f"Erro ao ler tabela: {e}")
+            
+            prompt_email = f"Assunto: {assunto_email}\n{instrucoes_extras}\n{conteudo_tabela}"
+            res, mod = call_technobolt_ai(prompt_email, system_context="email_fornecedor")
+            st.session_state.update({'titulo_resultado': "Rascunho de Email Profissional", 'resultado_ia': res, 'mostrar_resultado': True})
             st.rerun()
 
 elif "💬 Vendas" in escolha:
