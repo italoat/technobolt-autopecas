@@ -117,28 +117,74 @@ def buscar_imagem_peca(query):
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    html, body, [data-testid="stAppViewContainer"] { background-color: #f8fafc !important; font-family: 'Inter', sans-serif !important; }
+    
+    /* FORÇAR FUNDO E FONTE GLOBAL */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    /* REMOVER SIDEBAR E ELEMENTOS PADRÃO */
     [data-testid="stSidebar"] { display: none !important; }
     header, footer { visibility: hidden !important; }
+
+    /* CARD PRINCIPAL - FORÇAR BRANCO NO MOBILE */
     .main-card {
-        background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px;
-        padding: 45px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); margin-bottom: 30px;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 24px !important;
+        padding: 45px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04) !important;
+        margin-bottom: 30px;
+        color: #0f172a !important; /* Cor do texto dentro do card */
     }
+
+    /* TÍTULO COM GRADIENTE */
     .hero-title {
         font-size: 42px; font-weight: 800; text-align: center;
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
         letter-spacing: -2px; margin-bottom: 10px;
     }
+
+    /* BOTÕES - CORES ESTÁTICAS */
     .stButton > button {
         width: 100%; border-radius: 14px; height: 3.8em; font-weight: 700;
-        background: #1e40af !important; color: white !important; border: none !important;
+        background-color: #1e40af !important; 
+        color: #ffffff !important; 
+        border: none !important;
         text-transform: uppercase; letter-spacing: 1.5px; transition: 0.4s;
     }
-    .stButton > button:hover { background: #1e3a8a !important; transform: translateY(-2px); }
+    
+    .stButton > button:hover {
+        background-color: #1e3a8a !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+    }
+
+    /* BADGE DE STATUS */
     .status-badge {
-        padding: 6px 18px; border-radius: 50px; background: #eff6ff; 
-        color: #1e40af; font-size: 12px; font-weight: 700; border: 1px solid #dbeafe;
+        padding: 6px 18px; border-radius: 50px; 
+        background-color: #eff6ff !important; 
+        color: #1e40af !important; 
+        font-size: 12px; font-weight: 700; 
+        border: 1px solid #dbeafe !important;
+        display: inline-block;
+    }
+
+    /* MEDIA QUERY PARA AJUSTES FINOS NO MOBILE */
+    @media (max-width: 768px) {
+        .main-card { padding: 20px !important; margin-bottom: 15px !important; }
+        .hero-title { font-size: 28px !important; }
+        .stButton > button { height: 3.2em !important; font-size: 14px !important; }
+    }
+    
+    /* FORÇAR INPUTS A NÃO FICAREM PRETOS NO MOBILE */
+    input, textarea, [data-baseweb="select"] {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
     }
 </style>
 """, unsafe_allow_html=True)
